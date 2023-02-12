@@ -1,0 +1,9 @@
+diffusers[torch]==0.12.1
+onnxruntime==1.13.1
+safetensors==0.2.8
+torch
+torchvision
+transformers==4.26.0
+xformers==0.0.16rc425
+invisible-watermark
+triton

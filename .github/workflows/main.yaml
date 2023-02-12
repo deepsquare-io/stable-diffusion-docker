@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build-export:
+    name: Build and export
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Context for Buildx
+        run: |
+          docker context create builders
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          version: latest
+          endpoint: builders
+
+      - name: Login to Deepsquare Registry
+        uses: docker/login-action@v2
+        with:
+          registry: registry-1.deepsquare.run
+          username: ${{ secrets.DEEPSQUARE_USER }}
+          password: ${{ secrets.DEEPSQUARE_PASSWORD }}
+
+      - name: Build and export
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            registry-1.deepsquare.run/library/stable-diffusion:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
